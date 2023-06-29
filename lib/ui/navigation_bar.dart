@@ -6,7 +6,9 @@ import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NavigationBar extends StatefulWidget {
-  const NavigationBar({Key? key}) : super(key: key);
+  final double topPadding;
+
+  const NavigationBar({this.topPadding = 30, Key? key}) : super(key: key);
 
   @override
   State<NavigationBar> createState() => _NavigationBarState();
@@ -16,7 +18,7 @@ class _NavigationBarState extends State<NavigationBar> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 40.0, top: 30, right: 50),
+      padding: EdgeInsets.only(left: 40.0, top: widget.topPadding, right: 50),
       child: Row(
         children: [
           themeButton(),

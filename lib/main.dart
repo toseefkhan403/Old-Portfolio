@@ -19,7 +19,7 @@ class App extends StatelessWidget {
       dark: darkTheme(),
       initial: AdaptiveThemeMode.dark,
       builder: (theme, darkTheme) => MaterialApp(
-        title: 'TAK',
+        title: 'Toseef Ali Khan',
         theme: theme,
         darkTheme: darkTheme,
         home: const HomePage(),

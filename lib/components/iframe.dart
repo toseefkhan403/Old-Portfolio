@@ -21,8 +21,8 @@ class _IFrameState extends State<IFrame> {
     return Padding(
       padding: const EdgeInsets.only(top: 100, bottom: 20),
       child: SizedBox(
-        height: 700,
-        width: 320,
+        height: 600,
+        width: 300,
         child: Stack(
           children: [
             AnimatedOpacity(
