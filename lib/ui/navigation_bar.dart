@@ -23,9 +23,12 @@ class _NavigationBarState extends State<NavigationBar> {
         children: [
           themeButton(),
           Spacer(),
-          navigationItem(Icon(Feather.mail), "mailto:toseefkhan403@gmail.com?subject=Hey!%20Let's%20Connect&body=Your%20website%20is%20Awesome!"),
-          navigationItem(Icon(Feather.linkedin), "https://www.linkedin.com/in/toseef-khan/"),
-          navigationItem(Icon(Feather.github), "https://github.com/toseefkhan403"),
+          navigationItem(Icon(Feather.mail),
+              "mailto:toseefkhan403@gmail.com?subject=Hey!%20Let's%20Connect&body=Your%20website%20is%20Awesome!"),
+          navigationItem(Icon(Feather.linkedin),
+              "https://www.linkedin.com/in/toseef-khan/"),
+          navigationItem(
+              Icon(Feather.github), "https://github.com/toseefkhan403"),
         ],
       ),
     );

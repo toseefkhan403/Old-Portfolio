@@ -69,7 +69,7 @@ class _IFrameState extends State<IFrame> {
     _iframeElement2.width = '320';
     // autoplay = true in prod
     _iframeElement2.src =
-        'https://appetize.io/embed/ag_ihj33wjg6a7efmoh4mqv5fcmoa?scale=66';
+        'https://appetize.io/embed/ag_ihj33wjg6a7efmoh4mqv5fcmoa?scale=66&autoplay=true';
     _iframeElement2.style.border = 'none';
     ui.platformViewRegistry.registerViewFactory(
       'iframeElement2',

@@ -7,10 +7,10 @@ import 'package:portfolio/components/iframe.dart';
 import 'package:portfolio/ui/theme.dart';
 import 'package:portfolio/ui/up_fade_animation.dart';
 import 'package:toggle_switch/toggle_switch.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:portfolio/ui/corner_bottom_painter.dart';
 import 'package:portfolio/ui/corner_top_painter.dart';
 import 'package:portfolio/ui/navigation_bar.dart' as nav_bar;
+import 'dart:html' as html;
 
 class HomePage extends StatefulWidget {
   const HomePage({
@@ -31,6 +31,9 @@ class _HomePageState extends State<HomePage>
   late AnimationController _controller;
   late Animation<double> _animation;
   bool isAndroid = false;
+
+  final _scrollController = ScrollController();
+  bool atBottom = false;
 
   String description =
       "I am a mobile developer with 2 years of experience specializing in Flutter. I'm passionate about creating elegant and user-friendly applications. \nWith expertise in Flutter, I have built cross-platform apps that deliver exceptional performance. \nCheck out some of my apps in the emulator!";
@@ -54,7 +57,7 @@ class _HomePageState extends State<HomePage>
                     painter: CornerTopPainter(_animation, color1, color2),
                   ),
                 ),
-                const Align(
+                Align(
                     alignment: Alignment.topCenter,
                     child: nav_bar.NavigationBar()),
                 Padding(
@@ -122,94 +125,120 @@ class _HomePageState extends State<HomePage>
   }
 
   smallScreenLayout() {
-    return MouseRegion(
-      onEnter: swapColors,
-      onExit: swapColors,
-      child: Stack(
-        children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: CustomPaint(
-              size: const Size(300, 300),
-              painter: CornerTopPainter(_animation, color1, color2),
-            ),
+    return Scaffold(
+      floatingActionButton:
+      atBottom ? Align(
+        alignment: Alignment.bottomLeft,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 40, bottom: 40),
+          child: FloatingActionButton(
+            backgroundColor: color1,
+            onPressed: () {
+              _scrollController.animateTo(0,
+                  duration: Duration(milliseconds: 400), curve: Curves.easeOut);
+            },
+            child: const Icon(Icons.arrow_upward),
           ),
-          // if put below listview, does not scroll - stupid
-          Align(
-            alignment: Alignment.bottomRight,
-            child: CustomPaint(
-              size: const Size(300, 300),
-              painter: CornerBottomPainter(_animation, color1, color2),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20.0),
-            child: ScrollConfiguration(
-              behavior: ScrollConfiguration.of(context).copyWith(
-                dragDevices: {
-                  PointerDeviceKind.touch,
-                  PointerDeviceKind.mouse,
-                },
+        ),
+      ) : Container(),
+      body: MouseRegion(
+        onEnter: swapColors,
+        onExit: swapColors,
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topLeft,
+              child: CustomPaint(
+                size: const Size(300, 300),
+                painter: CornerTopPainter(_animation, color1, color2),
               ),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  // top half
-                  const nav_bar.NavigationBar(topPadding: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: introWidget(color1Copy, color2Copy, isSmall: true),
-                  ),
-
-                  // bottom half
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+            ),
+            // if put below listview, does not scroll - stupid
+            Align(
+              alignment: Alignment.bottomRight,
+              child: CustomPaint(
+                size: const Size(300, 300),
+                painter: CornerBottomPainter(_animation, color1, color2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                  },
+                ),
+                child: RefreshIndicator(
+                  color: color1,
+                  onRefresh: () async {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (BuildContext context) => super.widget));
+                  },
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: _scrollController,
                     children: [
+                      // top half
+                      const nav_bar.NavigationBar(topPadding: 10),
                       Padding(
-                        padding: const EdgeInsets.only(right: 20.0),
-                        child: RotatedBox(
-                          quarterTurns: 3,
-                          child: ToggleSwitch(
-                            minWidth: 120.0,
-                            cornerRadius: 20.0,
-                            initialLabelIndex: isAndroid ? 0 : 1,
-                            activeFgColor: Colors.black,
-                            inactiveBgColor: Colors.blueGrey,
-                            inactiveFgColor: Colors.white,
-                            totalSwitches: 2,
-                            labels: const ['Android', 'iOS'],
-                            icons: const [
-                              MaterialIcons.android,
-                              FontAwesome5Brands.apple
-                            ],
-                            iconSize: 24,
-                            activeBgColors: const [
-                              [Colors.lightGreen],
-                              [Colors.white]
-                            ],
-                            onToggle: (index) {
-                              print('switched to: $index $isAndroid');
-                              if (index == 0) {
-                                isAndroid = true;
-                              } else if (index == 1) {
-                                isAndroid = false;
-                              }
-
-                              setState(() {});
-                            },
-                          ),
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 50),
+                        child:
+                            introWidget(color1Copy, color2Copy, isSmall: true),
                       ),
-                      IFrame(
-                        isAndroid: isAndroid,
+
+                      // bottom half
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 20.0),
+                            child: RotatedBox(
+                              quarterTurns: 3,
+                              child: ToggleSwitch(
+                                minWidth: 120.0,
+                                cornerRadius: 20.0,
+                                initialLabelIndex: isAndroid ? 0 : 1,
+                                activeFgColor: Colors.black,
+                                inactiveBgColor: Colors.blueGrey,
+                                inactiveFgColor: Colors.white,
+                                totalSwitches: 2,
+                                labels: const ['Android', 'iOS'],
+                                icons: const [
+                                  MaterialIcons.android,
+                                  FontAwesome5Brands.apple
+                                ],
+                                iconSize: 24,
+                                activeBgColors: const [
+                                  [Colors.lightGreen],
+                                  [Colors.white]
+                                ],
+                                onToggle: (index) {
+                                  print('switched to: $index $isAndroid');
+                                  if (index == 0) {
+                                    isAndroid = true;
+                                  } else if (index == 1) {
+                                    isAndroid = false;
+                                  }
+
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          ),
+                          IFrame(
+                            isAndroid: isAndroid,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -247,17 +276,21 @@ class _HomePageState extends State<HomePage>
                 : Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: cornerGradient(color1, color2),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(4.0),
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('assets/images/me.jpg'),
+                      GestureDetector(
+                        onTap: changeColors,
+                        child: Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: cornerGradient(color1, color2),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(4.0),
+                            child: CircleAvatar(
+                              backgroundImage:
+                                  AssetImage('assets/images/me.jpg'),
+                            ),
                           ),
                         ),
                       ),
@@ -292,17 +325,20 @@ class _HomePageState extends State<HomePage>
 
   rowToColIntro() => Column(
         children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: cornerGradient(color1, color2),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.all(4.0),
-              child: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/me.jpg'),
+          GestureDetector(
+            onTap: changeColors,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: cornerGradient(color1, color2),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(4.0),
+                child: CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/me.jpg'),
+                ),
               ),
             ),
           ),
@@ -323,16 +359,23 @@ class _HomePageState extends State<HomePage>
         ],
       );
 
+  void downloadFile(String filename) {
+    final anchor = html.AnchorElement(href: '/assets/$filename')
+      ..setAttribute("download", filename)
+      ..click();
+  }
+
   cvButton(Color color1, Color color2) {
     return Align(
       alignment: Alignment.bottomLeft,
       child: GestureDetector(
         onTap: () async {
           // download the cv
-          if (!await launchUrl(Uri.parse(
-              "https://github.com/toseefkhan403/toseefkhan403.github.io/blob/main/Resume.pdf"))) {
-            throw Exception('Could not launch');
-          }
+          downloadFile('Toseef Ali Khan.pdf');
+          // if (!await launchUrl(Uri.parse(
+          //     "https://github.com/toseefkhan403/toseefkhan403.github.io/blob/main/Resume.pdf"))) {
+          //   throw Exception('Could not launch');
+          // }
         },
         child: MouseRegion(
           onEnter: (_) {
@@ -379,6 +422,35 @@ class _HomePageState extends State<HomePage>
 
   @override
   void initState() {
+    initColors();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge) {
+        bool isTop = _scrollController.position.pixels <= 60;
+        if (isTop) {
+          atBottom = false;
+        } else {
+          atBottom = true;
+        }
+        setState(() {});
+      }
+    });
+
+    super.initState();
+  }
+
+  changeColors() {
+    color1 = getRandomColor();
+    color2 = getRandomColor();
+    color1Copy = color1;
+    color2Copy = color2;
+
+    setState(() {});
+    _controller.reset();
+    _controller.forward();
+  }
+
+  initColors() {
     color1 = getRandomColor();
     color2 = getRandomColor();
     color1Copy = color1;
@@ -392,7 +464,6 @@ class _HomePageState extends State<HomePage>
     _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
 
     _controller.forward();
-    super.initState();
   }
 
   @override
