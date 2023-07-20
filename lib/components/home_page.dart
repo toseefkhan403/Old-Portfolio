@@ -126,21 +126,23 @@ class _HomePageState extends State<HomePage>
 
   smallScreenLayout() {
     return Scaffold(
-      floatingActionButton:
-      atBottom ? Align(
-        alignment: Alignment.bottomLeft,
-        child: Padding(
-          padding: const EdgeInsets.only(left: 40, bottom: 40),
-          child: FloatingActionButton(
-            backgroundColor: color1,
-            onPressed: () {
-              _scrollController.animateTo(0,
-                  duration: Duration(milliseconds: 400), curve: Curves.easeOut);
-            },
-            child: const Icon(Icons.arrow_upward),
-          ),
-        ),
-      ) : Container(),
+      floatingActionButton: atBottom
+          ? Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 40, bottom: 40),
+                child: FloatingActionButton(
+                  backgroundColor: color1,
+                  onPressed: () {
+                    _scrollController.animateTo(0,
+                        duration: Duration(milliseconds: 400),
+                        curve: Curves.easeOut);
+                  },
+                  child: const Icon(Icons.arrow_upward),
+                ),
+              ),
+            )
+          : Container(),
       body: MouseRegion(
         onEnter: swapColors,
         onExit: swapColors,
@@ -359,23 +361,12 @@ class _HomePageState extends State<HomePage>
         ],
       );
 
-  void downloadFile(String filename) {
-    final anchor = html.AnchorElement(href: '/assets/$filename')
-      ..setAttribute("download", filename)
-      ..click();
-  }
-
   cvButton(Color color1, Color color2) {
     return Align(
       alignment: Alignment.bottomLeft,
       child: GestureDetector(
         onTap: () async {
-          // download the cv
-          downloadFile('Toseef Ali Khan.pdf');
-          // if (!await launchUrl(Uri.parse(
-          //     "https://github.com/toseefkhan403/toseefkhan403.github.io/blob/main/Resume.pdf"))) {
-          //   throw Exception('Could not launch');
-          // }
+          html.window.open("/assets/Toseef Ali Khan.pdf", "text");
         },
         child: MouseRegion(
           onEnter: (_) {
@@ -395,7 +386,7 @@ class _HomePageState extends State<HomePage>
               child: Column(
                 children: [
                   Text(
-                    "Download CV",
+                    "View Resume",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
